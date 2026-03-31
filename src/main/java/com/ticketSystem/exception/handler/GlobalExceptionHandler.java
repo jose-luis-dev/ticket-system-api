@@ -14,7 +14,7 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // 404
+    // Manejo de 404
     @ExceptionHandler(TicketNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public Map<String, String> handleNotFound(TicketNotFoundException ex) {
@@ -24,7 +24,7 @@ public class GlobalExceptionHandler {
         );
     }
 
-    // 403
+    // Manejo de 403
     @ExceptionHandler(UnauthorizedOperationException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public Map<String, String> handleUnauthorized(UnauthorizedOperationException ex){
@@ -34,7 +34,7 @@ public class GlobalExceptionHandler {
         );
     }
 
-    // 500
+    // Manejo de 500
     @ExceptionHandler(DatabaseException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Map<String, String> handleDatabase(DatabaseException ex){
@@ -44,7 +44,7 @@ public class GlobalExceptionHandler {
         );
     }
 
-    // General
+    // Exception general
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Map<String, String> handleGeneral(Exception ex){
