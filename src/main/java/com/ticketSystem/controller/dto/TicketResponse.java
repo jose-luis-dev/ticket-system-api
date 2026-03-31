@@ -15,9 +15,11 @@ public class TicketResponse {
     public int getId() {
         return id;
     }
+
     public String getTitulo() {
         return titulo;
     }
+
     public String getDescripcion() {
         return descripcion;
     }
