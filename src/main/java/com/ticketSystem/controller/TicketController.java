@@ -70,11 +70,20 @@ public class TicketController {
                 .body(response);
     }
 
+    private RolUsuario parseRol(String role){
+        try {
+            return RolUsuario.valueOf(role);
+        }catch (IllegalArgumentException e){
+            throw new IllegalArgumentException("Rol inválido: " + role);
+        }
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarTicket(@PathVariable int id, @RequestHeader("X-User-Role") String role){
-        Usuario usuarioActual = new Usuario(RolUsuario.valueOf(role));
-        deleteTicketUseCase.execute(id, usuarioActual);
 
+        RolUsuario rolUsuario = parseRol(role);
+        Usuario usuarioActual = new Usuario(rolUsuario);
+        deleteTicketUseCase.execute(id, usuarioActual);
         return ResponseEntity.noContent().build();
     }
 
