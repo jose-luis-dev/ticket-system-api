@@ -4,6 +4,7 @@ import com.ticketSystem.enums.EstadoOperacional;
 import com.ticketSystem.enums.Prioridad;
 import com.ticketSystem.enums.RolUsuario;
 import com.ticketSystem.exception.TicketNotFoundException;
+import com.ticketSystem.exception.UnauthorizedOperationException;
 import com.ticketSystem.model.Ticket;
 import com.ticketSystem.model.Usuario;
 import com.ticketSystem.repository.ITicketRepository;
@@ -56,7 +57,7 @@ public class TicketService {
     public boolean eliminarTicket(int idTicket, Usuario usuarioActual){
 
         if (usuarioActual.getRol() != RolUsuario.ADMIN) {
-            throw new UnsupportedOperationException(
+            throw new UnauthorizedOperationException(
                     "No tienes permisos para eliminar tickets"
             );
         }

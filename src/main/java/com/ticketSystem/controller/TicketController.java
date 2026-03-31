@@ -1,14 +1,20 @@
 package com.ticketSystem.controller;
 
 import com.ticketSystem.application.CreateTicketUseCase;
+import com.ticketSystem.application.DeleteTicketUseCase;
 import com.ticketSystem.application.GetTicketByUseCase;
 import com.ticketSystem.application.ListTicketUseCase;
 import com.ticketSystem.controller.dto.CreateTicketRequest;
 import com.ticketSystem.controller.dto.TicketMapper;
 import com.ticketSystem.controller.dto.TicketResponse;
+import com.ticketSystem.enums.RolUsuario;
 import com.ticketSystem.model.Ticket;
+import com.ticketSystem.model.Usuario;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -18,37 +24,58 @@ public class TicketController {
     private final CreateTicketUseCase createTicketUseCase;
     private final GetTicketByUseCase getTicketByUseCase;
     private final ListTicketUseCase listTicketUseCase;
+    private final DeleteTicketUseCase deleteTicketUseCase;
 
     public TicketController(CreateTicketUseCase createTicketUseCase,
                             GetTicketByUseCase getTicketByUseCase,
-                            ListTicketUseCase listTicketUseCase) {
+                            ListTicketUseCase listTicketUseCase,
+                            DeleteTicketUseCase deleteTicketUseCase) {
         this.createTicketUseCase = createTicketUseCase;
         this.getTicketByUseCase = getTicketByUseCase;
         this.listTicketUseCase = listTicketUseCase;
+        this.deleteTicketUseCase = deleteTicketUseCase;
     }
 
 
     @GetMapping
-    public List<TicketResponse> listarTicket(){
-        return listTicketUseCase.execute()
+    public ResponseEntity<List<TicketResponse>> listarTicket(){
+
+        List<TicketResponse> response = listTicketUseCase.execute()
                 .stream()
                 .map(TicketMapper::toResponse)
                 .toList();
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
-    public TicketResponse obtenerTicket(@PathVariable int id){
-        return TicketMapper.toResponse (getTicketByUseCase.execute(id));
+    public ResponseEntity<TicketResponse> obtenerTicket(@PathVariable int id){
+        TicketResponse response = TicketMapper.toResponse (getTicketByUseCase.execute(id));
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
-    public TicketResponse crearTicket(@RequestBody CreateTicketRequest request){
+    public ResponseEntity<TicketResponse> crearTicket(@RequestBody CreateTicketRequest request){
 
         Ticket ticket = createTicketUseCase.execute(
                 request.getTitulo(),
                 request.getDescripcion()
         );
-        return TicketMapper.toResponse(ticket);
+        TicketResponse response = TicketMapper.toResponse(ticket);
+
+        URI location = URI.create("/tickets/" + ticket.getIdTicket());
+
+        return ResponseEntity
+                .created(location)
+                .body(response);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarTicket(@PathVariable int id, @RequestHeader("X-User-Role") String role){
+        Usuario usuarioActual = new Usuario(RolUsuario.valueOf(role));
+        deleteTicketUseCase.execute(id, usuarioActual);
+
+        return ResponseEntity.noContent().build();
     }
 
 
