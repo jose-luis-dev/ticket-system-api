@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: ticket-system-api
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/ticket_system
+    username: YOUR_USER
+    password: YOUR_PASSWORD
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  sql:
+    init:
+      mode: never
+
+server:
+    port: 8080
