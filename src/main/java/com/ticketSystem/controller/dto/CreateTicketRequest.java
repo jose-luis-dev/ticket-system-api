@@ -1,6 +1,5 @@
 package com.ticketSystem.controller.dto;
 
-
 import jakarta.validation.constraints.NotBlank;
 
 public class CreateTicketRequest {

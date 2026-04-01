@@ -80,6 +80,4 @@ public class GlobalExceptionHandler {
         return errors;
     }
 
-
-
 }
