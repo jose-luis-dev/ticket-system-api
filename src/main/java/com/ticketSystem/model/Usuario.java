@@ -8,6 +8,8 @@ public class Usuario {
     private String password;
     private RolUsuario rol;
 
+    public Usuario(){}
+
     public Usuario(RolUsuario rol){
         this.rol = rol;
     }

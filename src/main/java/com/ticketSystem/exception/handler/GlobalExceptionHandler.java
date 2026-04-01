@@ -5,10 +5,12 @@ import com.ticketSystem.exception.DatabaseException;
 import com.ticketSystem.exception.TicketNotFoundException;
 import com.ticketSystem.exception.UnauthorizedOperationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice
@@ -62,6 +64,20 @@ public class GlobalExceptionHandler {
                 "error", "BAD_REQUEST",
                 "message", ex.getMessage()
         );
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleValidationErrors(
+            MethodArgumentNotValidException ex) {
+
+        Map<String, String> errors = new HashMap<>();
+
+        ex.getBindingResult().getFieldErrors().forEach(error ->
+                errors.put(error.getField(), error.getDefaultMessage())
+        );
+
+        return errors;
     }
 
 

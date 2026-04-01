@@ -10,7 +10,7 @@ import com.ticketSystem.controller.dto.TicketResponse;
 import com.ticketSystem.enums.RolUsuario;
 import com.ticketSystem.model.Ticket;
 import com.ticketSystem.model.Usuario;
-import org.springframework.http.HttpStatus;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,7 +55,7 @@ public class TicketController {
     }
 
     @PostMapping
-    public ResponseEntity<TicketResponse> crearTicket(@RequestBody CreateTicketRequest request){
+    public ResponseEntity<TicketResponse> crearTicket(@Valid @RequestBody CreateTicketRequest request){
 
         Ticket ticket = createTicketUseCase.execute(
                 request.getTitulo(),
