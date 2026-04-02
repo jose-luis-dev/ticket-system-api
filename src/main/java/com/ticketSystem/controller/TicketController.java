@@ -4,6 +4,7 @@ import com.ticketSystem.application.CreateTicketUseCase;
 import com.ticketSystem.application.DeleteTicketUseCase;
 import com.ticketSystem.application.GetTicketByUseCase;
 import com.ticketSystem.application.ListTicketUseCase;
+import com.ticketSystem.controller.dto.ApiResponse;
 import com.ticketSystem.controller.dto.CreateTicketRequest;
 import com.ticketSystem.controller.dto.TicketMapper;
 import com.ticketSystem.controller.dto.TicketResponse;
@@ -11,10 +12,10 @@ import com.ticketSystem.enums.RolUsuario;
 import com.ticketSystem.model.Ticket;
 import com.ticketSystem.model.Usuario;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -38,24 +39,32 @@ public class TicketController {
 
 
     @GetMapping
-    public ResponseEntity<List<TicketResponse>> listarTicket(){
+    public ResponseEntity<ApiResponse<List<TicketResponse>>> listarTicket(){
 
-        List<TicketResponse> response = listTicketUseCase.execute()
+        List<TicketResponse> responseList = listTicketUseCase.execute()
                 .stream()
                 .map(TicketMapper::toResponse)
                 .toList();
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new ApiResponse<>(
+                true,
+                "Lista de tickets",
+                responseList
+        ));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TicketResponse> obtenerTicket(@PathVariable int id){
+    public ResponseEntity<ApiResponse <TicketResponse>> obtenerTicket(@PathVariable int id){
         TicketResponse response = TicketMapper.toResponse (getTicketByUseCase.execute(id));
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new ApiResponse<>(
+                true,
+                "Ticket obtenido",
+                response
+        ));
     }
 
     @PostMapping
-    public ResponseEntity<TicketResponse> crearTicket(@Valid @RequestBody CreateTicketRequest request){
+    public ResponseEntity<ApiResponse<TicketResponse>> crearTicket(@Valid @RequestBody CreateTicketRequest request){
 
         Ticket ticket = createTicketUseCase.execute(
                 request.getTitulo(),
@@ -63,11 +72,13 @@ public class TicketController {
         );
         TicketResponse response = TicketMapper.toResponse(ticket);
 
-        URI location = URI.create("/tickets/" + ticket.getIdTicket());
-
         return ResponseEntity
-                .created(location)
-                .body(response);
+                .status(HttpStatus.CREATED)
+                .body(new ApiResponse<>(
+                        true,
+                        "Ticket creado correctamente",
+                        response
+                ));
     }
 
     private RolUsuario parseRol(String role){
