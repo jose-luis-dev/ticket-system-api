@@ -8,6 +8,11 @@ public class Usuario {
     private String password;
     private RolUsuario rol;
 
+    public Usuario(){}
+
+    public Usuario(RolUsuario rol){
+        this.rol = rol;
+    }
 
     public Usuario(int idUsuario, String nombre, String password, RolUsuario rol){
         this.idUsuario = idUsuario;
