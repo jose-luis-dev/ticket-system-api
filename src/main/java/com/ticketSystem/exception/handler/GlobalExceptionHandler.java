@@ -18,17 +18,6 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // 400
-//    @ExceptionHandler(MethodArgumentNotValidException.class)
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    public ErrorResponse handleValidationErrors( MethodArgumentNotValidException ex) {
-//        return new ErrorResponse(
-//                "VALIDATION_ERROR",
-//                "Datos inválidos"
-//        );
-//    }
-
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ValidationErrorResponse handleValidationErrors(
