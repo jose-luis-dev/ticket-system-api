@@ -7,27 +7,18 @@ import com.ticketSystem.exception.DatabaseException;
 import com.ticketSystem.exception.TicketNotFoundException;
 import com.ticketSystem.exception.UnauthorizedOperationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
-    // 400
-//    @ExceptionHandler(MethodArgumentNotValidException.class)
-//    @ResponseStatus(HttpStatus.BAD_REQUEST)
-//    public ErrorResponse handleValidationErrors( MethodArgumentNotValidException ex) {
-//        return new ErrorResponse(
-//                "VALIDATION_ERROR",
-//                "Datos inválidos"
-//        );
-//    }
-
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -77,16 +68,16 @@ public class GlobalExceptionHandler {
         );
     }
 
-    // Exception general
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public Map<String, String> handleGeneral(Exception ex){
-        return Map.of(
-                "error", "INTERNAL_ERROR",
-                "message", ex.getMessage()
-        );
-    }
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex) {
 
+        ErrorResponse error = new ErrorResponse(
+                "Access denied",
+                "FORBIDDEN"
+        );
+
+        return ResponseEntity.status(403).body(error);
+    }
 
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -95,5 +86,18 @@ public class GlobalExceptionHandler {
                 "error", "BAD_REQUEST",
                 "message", ex.getMessage()
         );
+    }
+
+
+    // Exception general
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse>  handleGeneral(Exception ex){
+
+        ErrorResponse error = new ErrorResponse(
+                "Internal server error",
+                "INTERNAL_ERROR"
+        );
+        return ResponseEntity.status(500).body(error);
+
     }
 }
