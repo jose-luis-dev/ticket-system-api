@@ -12,5 +12,9 @@ spring:
     init:
       mode: never
 
+jwt:
+  secret: "my-super-secret-key"
+  expiration: "time token"
+
 server:
     port: 8080

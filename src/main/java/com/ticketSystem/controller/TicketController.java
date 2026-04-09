@@ -14,6 +14,9 @@ import com.ticketSystem.model.Usuario;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,7 +40,7 @@ public class TicketController {
         this.deleteTicketUseCase = deleteTicketUseCase;
     }
 
-
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping
     public ResponseEntity<ApiResponse<List<TicketResponse>>> listarTicket(){
 
@@ -52,6 +55,7 @@ public class TicketController {
         ));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse <TicketResponse>> obtenerTicket(@PathVariable int id){
         TicketResponse response = TicketMapper.toResponse (getTicketByUseCase.execute(id));
@@ -63,6 +67,7 @@ public class TicketController {
         ));
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @PostMapping
     public ResponseEntity<ApiResponse<TicketResponse>> crearTicket(@Valid @RequestBody CreateTicketRequest request){
 
@@ -81,20 +86,20 @@ public class TicketController {
                 ));
     }
 
-    private RolUsuario parseRol(String role){
-        try {
-            return RolUsuario.valueOf(role);
-        }catch (IllegalArgumentException e){
-            throw new IllegalArgumentException("Rol inválido: " + role);
-        }
-    }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarTicket(@PathVariable int id, @RequestHeader("X-User-Role") String role){
+    public ResponseEntity<Void> eliminarTicket(@PathVariable int id){
 
-        RolUsuario rolUsuario = parseRol(role);
-        Usuario usuarioActual = new Usuario(rolUsuario);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        String authority = auth.getAuthorities().iterator().next().getAuthority();
+        RolUsuario rolEnum = RolUsuario.valueOf(authority.replace("ROLE_", ""));
+
+        Usuario usuarioActual = new Usuario(rolEnum);
+
         deleteTicketUseCase.execute(id, usuarioActual);
+
         return ResponseEntity.noContent().build();
     }
 
