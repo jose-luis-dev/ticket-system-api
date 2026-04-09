@@ -13,7 +13,7 @@ El proyecto evoluciona desde una aplicación en consola hasta una arquitectura b
 ---
 
 
-## Evolción del proyecto
+## Evolución del proyecto
 
 ### v1.0 - Console
 - CRUD de tickets en memoria
