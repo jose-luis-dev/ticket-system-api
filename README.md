@@ -67,6 +67,23 @@ El proyecto evoluciona desde una aplicación en consola hasta una arquitectura b
 - Configuración externa de seguridad (`jwt.secret`, `jwt.expiration`)
 - Logging estructurado para eventos de autenticación
 
+### v4.0 - State Machine & Domain Rules
+
+- Implementación de State Machine sin librería externa
+- Validación de transiciones de estado a nivel de dominio con `TicketStateTransitionValidator`
+- Bloqueo de modificación de prioridad en tickets con estado final
+- Nuevas excepciones de dominio: `InvalidTransicionException`, `InvalidOperationException`
+- Nuevos Use Cases: `UpdateTicketStatusUseCase`, `UpdateTicketPriorityUseCase`
+- Nuevos endpoints PATCH para estado y prioridad
+- Fix GlobalExceptionHandler: errores de dominio retornan 409 Conflict
+
+Business rules:
+- ABIERTO -> EN_PROCESO, CANCELADO
+- EN_PROCESO -> CERRADO, CANCELADO
+- CERRADO -> estado final (irreversible)
+- CANCELADO -> estado final (irreversible)
+- La prioridad no puede modificarse si el ticket está CERRADO o CANCELADO
+
 ---
 
 ## Tecnologías
@@ -97,6 +114,8 @@ El proyecto evoluciona desde una aplicación en consola hasta una arquitectura b
 - GET /tickets/{id} --> Requiere autenticación
 - POST /tickets --> Requiere autenticación
 - DELETE /tickets/{id} --> Solo ADMIN puede ejecutar el proceso
+- PATCH /tickets/{id}/estado --> ADMIN y USER
+- PATCH /tickets/{id}/prioridad --> ADMIN y USER
 
 
 ### Códigos de respuesta
@@ -104,9 +123,11 @@ El proyecto evoluciona desde una aplicación en consola hasta una arquitectura b
 - 200 --> OK
 - 201 --> Created
 - 204 --> No Content
-- 400 --> Bad Request
+- 400 --> Bad Request (datos de entrada inválidos)
 - 401 --> Unauthorized
 - 403 --> Forbidden
+- 404 --> Not Found (ticket no existe)
+- 409 --> Conflict (transición de estado inválido / operación bloqueada por estado final)
 - 500 --> Internal Server Error
 
 ---
