@@ -8,7 +8,9 @@ public class TicketMapper {
         return new TicketResponse(
                 ticket.getIdTicket(),
                 ticket.getTitulo(),
-                ticket.getDescripcion()
+                ticket.getDescripcion(),
+                ticket.getEstadoOperacionalActual(),
+                ticket.getPrioridadActual()
         );
     }
 }

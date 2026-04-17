@@ -3,6 +3,7 @@ package com.ticketSystem.model;
 import com.ticketSystem.enums.EstadoOperacional;
 import com.ticketSystem.enums.EstadoRegistro;
 import com.ticketSystem.enums.Prioridad;
+import org.springframework.data.relational.core.sql.In;
 
 import java.util.Objects;
 
@@ -22,11 +23,19 @@ public class Ticket {
         this.estadoOperacionalTicket = EstadoRegistro.ACTIVO;
     }
 
-
     public Ticket(Integer idTicket, String titulo, String descripcion){
         this.idTicket = idTicket;
         this.titulo = titulo;
         this.descripcion = descripcion;
+    }
+
+    public Ticket(Integer idTicket, String titulo, String descripcion, EstadoOperacional estadoOperacional, Prioridad prioridad, EstadoRegistro estadoRegistro) {
+        this.idTicket = idTicket;
+        this.titulo = titulo;
+        this.descripcion = descripcion;
+        this.estadoOperacionalActual = estadoOperacional;
+        this.prioridadActual = prioridad;
+        this.estadoOperacionalTicket = estadoRegistro;
     }
 
 

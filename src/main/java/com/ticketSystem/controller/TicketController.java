@@ -1,13 +1,7 @@
 package com.ticketSystem.controller;
 
-import com.ticketSystem.application.CreateTicketUseCase;
-import com.ticketSystem.application.DeleteTicketUseCase;
-import com.ticketSystem.application.GetTicketByUseCase;
-import com.ticketSystem.application.ListTicketUseCase;
-import com.ticketSystem.controller.dto.ApiResponse;
-import com.ticketSystem.controller.dto.CreateTicketRequest;
-import com.ticketSystem.controller.dto.TicketMapper;
-import com.ticketSystem.controller.dto.TicketResponse;
+import com.ticketSystem.application.*;
+import com.ticketSystem.controller.dto.*;
 import com.ticketSystem.enums.RolUsuario;
 import com.ticketSystem.model.Ticket;
 import com.ticketSystem.model.Usuario;
@@ -29,15 +23,21 @@ public class TicketController {
     private final GetTicketByUseCase getTicketByUseCase;
     private final ListTicketUseCase listTicketUseCase;
     private final DeleteTicketUseCase deleteTicketUseCase;
+    private final UpdateTicketStatusUseCase updateTicketStatusUseCase;
+    private final UpdateTicketPriorityUseCase updateTicketPriorityUseCase;
 
     public TicketController(CreateTicketUseCase createTicketUseCase,
                             GetTicketByUseCase getTicketByUseCase,
                             ListTicketUseCase listTicketUseCase,
-                            DeleteTicketUseCase deleteTicketUseCase) {
+                            DeleteTicketUseCase deleteTicketUseCase,
+                            UpdateTicketStatusUseCase updateTicketStatusUseCase,
+                            UpdateTicketPriorityUseCase updateTicketPriorityUseCase) {
         this.createTicketUseCase = createTicketUseCase;
         this.getTicketByUseCase = getTicketByUseCase;
         this.listTicketUseCase = listTicketUseCase;
         this.deleteTicketUseCase = deleteTicketUseCase;
+        this.updateTicketStatusUseCase = updateTicketStatusUseCase;
+        this.updateTicketPriorityUseCase = updateTicketPriorityUseCase;
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
@@ -102,5 +102,40 @@ public class TicketController {
 
         return ResponseEntity.noContent().build();
     }
+
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @PatchMapping("/{id}/estado")
+    public ResponseEntity<ApiResponse <Void>> cambiarEstado (
+            @PathVariable int id,
+            @Valid @RequestBody UpdateStatusRequest request) {
+
+        updateTicketStatusUseCase.execute(id, request.getEstadoOperacional());
+
+        return ResponseEntity.ok(new ApiResponse<>(
+                true,
+                "Estado actualizado correctamente",
+                null
+        ));
+    }
+
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @PatchMapping("/{id}/prioridad")
+    public ResponseEntity<ApiResponse <Void>> cambiarPrioridad (
+            @PathVariable int id,
+            @Valid @RequestBody UpdatePriorityRequest request) {
+
+        updateTicketPriorityUseCase.execute(id, request.getPrioridad());
+
+        return ResponseEntity.ok(new ApiResponse<>(
+                true,
+                "Prioridad actualizada correctamente",
+                null
+        ));
+
+    }
+
+
 
 }

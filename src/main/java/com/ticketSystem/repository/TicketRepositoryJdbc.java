@@ -14,11 +14,30 @@ import java.util.List;
 
 @Repository
 public class TicketRepositoryJdbc implements ITicketRepository {
-
     private final DataSource dataSource;
 
     public TicketRepositoryJdbc(DataSource dataSource){
         this.dataSource = dataSource;
+    }
+
+
+    private Ticket mapearTicket(ResultSet rs) throws SQLException {
+        Ticket ticket = new Ticket(
+                rs.getInt("Id"),
+                rs.getString("titulo"),
+                rs.getString("descripcion")
+        );
+
+        ticket.setEstadoOperacionalActual(
+                EstadoOperacional.valueOf(rs.getString("estado_operacional"))
+        );
+        ticket.setPrioridadActual(
+                Prioridad.valueOf(rs.getString("prioridad"))
+        );
+        ticket.setEstadoOperacionalTicket(
+                EstadoRegistro.valueOf(rs.getString("estado_registro"))
+        );
+        return ticket;
     }
 
     @Override
@@ -32,25 +51,7 @@ public class TicketRepositoryJdbc implements ITicketRepository {
              ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()){
-                Ticket ticket = new Ticket(
-                        rs.getInt("Id"),
-                        rs.getString("titulo"),
-                        rs.getString("descripcion")
-                );
-
-                ticket.setEstadoOperacionalActual(
-                        EstadoOperacional.valueOf(rs.getString("estado_operacional"))
-                );
-
-                ticket.setPrioridadActual(
-                        Prioridad.valueOf(rs.getString("prioridad"))
-                );
-
-                ticket.setEstadoOperacionalTicket(
-                        EstadoRegistro.valueOf(rs.getString("estado_registro"))
-                );
-
-                tickets.add(ticket);
+                tickets.add(mapearTicket(rs));
             }
         }catch (SQLException e){
             throw new DatabaseException("Error listado tickets ", e);
@@ -70,26 +71,7 @@ public class TicketRepositoryJdbc implements ITicketRepository {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-
-                Ticket ticket = new Ticket(
-                        rs.getInt("id"),
-                        rs.getString("titulo"),
-                        rs.getString("descripcion")
-                );
-
-                ticket.setEstadoOperacionalActual(
-                        EstadoOperacional.valueOf(rs.getString("estado_operacional"))
-                );
-
-                ticket.setPrioridadActual(
-                        Prioridad.valueOf(rs.getString("prioridad"))
-                );
-
-                ticket.setEstadoOperacionalTicket(
-                        EstadoRegistro.valueOf(rs.getString("estado_registro"))
-                );
-
-                return ticket;
+                return mapearTicket(rs);
             }
 
         }catch (SQLException e){

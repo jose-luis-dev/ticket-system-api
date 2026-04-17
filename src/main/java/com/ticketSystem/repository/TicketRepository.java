@@ -6,6 +6,10 @@ import com.ticketSystem.model.Ticket;
 import java.util.ArrayList;
 import java.util.List;
 
+
+// Implementación en memoria — reemplazada por TicketRepositoryJdbc
+// Conservada como referencia de la versión v1.0
+
 public class TicketRepository implements ITicketRepository {
 
     private List<Ticket> tickets = new ArrayList<>();

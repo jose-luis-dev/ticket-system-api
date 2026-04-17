@@ -70,9 +70,6 @@ public class TicketService {
     // Cambiar el estado del ticket setEstadoActual ABIERTO, EN_PROCESO, FINALIZADO
     public boolean cambiarEstadodeTicket(int idTicket, EstadoOperacional nuevoEstado){
         Ticket ticketEncontrado = buscarTicketId(idTicket);
-        if (ticketEncontrado == null){
-            throw new TicketNotFoundException(idTicket);
-        }
         ticketEncontrado.setEstadoOperacionalActual(nuevoEstado);
         ticketRepository.actualizar(ticketEncontrado);
         return true;
@@ -81,9 +78,6 @@ public class TicketService {
     // Cambiar la prioridad del ticket setPrioridadActual ALTA, MEDIA, BAJA
     public boolean cambiarPrioridadTicket(int idTicket, Prioridad prioridad){
         Ticket ticketEncontrado = buscarTicketId(idTicket);
-        if (ticketEncontrado == null){
-            throw new TicketNotFoundException(idTicket);
-        }
         ticketEncontrado.setPrioridadActual(prioridad);
         ticketRepository.actualizar(ticketEncontrado);
         return true;
