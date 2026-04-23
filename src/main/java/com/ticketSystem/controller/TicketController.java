@@ -90,16 +90,7 @@ public class TicketController {
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarTicket(@PathVariable int id){
-
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        String authority = auth.getAuthorities().iterator().next().getAuthority();
-        RolUsuario rolEnum = RolUsuario.valueOf(authority.replace("ROLE_", ""));
-
-        Usuario usuarioActual = new Usuario(rolEnum);
-
-        deleteTicketUseCase.execute(id, usuarioActual);
-
+        deleteTicketUseCase.execute(id);
         return ResponseEntity.noContent().build();
     }
 

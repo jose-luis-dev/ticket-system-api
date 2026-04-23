@@ -12,7 +12,7 @@ public class DeleteTicketUseCase {
         this.ticketService = ticketService;
     }
 
-    public boolean execute (int idTicket, Usuario usuarioActual){
-        return ticketService.eliminarTicket(idTicket, usuarioActual);
+    public boolean execute (int idTicket){
+        return ticketService.eliminarTicket(idTicket);
     }
 }

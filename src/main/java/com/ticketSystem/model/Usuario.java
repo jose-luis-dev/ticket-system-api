@@ -1,32 +1,104 @@
 package com.ticketSystem.model;
 
+import com.ticketSystem.enums.EstadoRegistro;
 import com.ticketSystem.enums.RolUsuario;
 
+import java.time.LocalDateTime;
+
 public class Usuario {
-    private int idUsuario;
-    private String nombre;
+
+    private Long id;
+    private String username;
     private String password;
+    private String nombre;
+    private String email;
     private RolUsuario rol;
+    private EstadoRegistro estado;
+    private LocalDateTime createdAt;
+    private String createdBy;
 
     public Usuario(){}
 
-    public Usuario(RolUsuario rol){
-        this.rol = rol;
-    }
+//    public Usuario(RolUsuario rol){
+//        this.rol = rol;
+//    }
 
-    public Usuario(int idUsuario, String nombre, String password, RolUsuario rol){
-        this.idUsuario = idUsuario;
-        this.nombre = nombre;
+    public Usuario(Long id,String username, String password,
+                   String nombre, String email,RolUsuario rol,
+                   EstadoRegistro estado, LocalDateTime createdAt,
+                   String createdBy){
+
+        this.id = id;
+        this.username = username;
         this.password = password;
+        this.nombre = nombre;
+        this.email = email;
+        this.rol = rol;
+        this.estado = estado;
+        this.createdAt = createdAt;
+        this.createdBy = createdBy;
+    }
+
+    public Long getId() {
+        return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public RolUsuario getRol() {
+        return rol;
+    }
+    public void setRol(RolUsuario rol) {
         this.rol = rol;
     }
 
-    public String getNombre() { return this.nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
+    public EstadoRegistro getEstado() {
+        return estado;
+    }
+    public void setEstado(EstadoRegistro estado) {
+        this.estado = estado;
+    }
 
-    public RolUsuario getRol() { return this.rol; }
-    public void setRol(RolUsuario rol) { this.rol = rol; }
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 
-    public String getPassword() { return this.password;}
-    public void setPassword(String password) { this.password = password; }
+    public String getCreatedBy() {
+        return createdBy;
+    }
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
 }

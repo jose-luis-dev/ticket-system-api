@@ -54,13 +54,7 @@ public class TicketService {
     }
 
     // Eliminar el ticket "Solo ADMIN"
-    public boolean eliminarTicket(int idTicket, Usuario usuarioActual){
-
-        if (usuarioActual.getRol() != RolUsuario.ADMIN) {
-            throw new UnauthorizedOperationException(
-                    "No tienes permisos para eliminar tickets"
-            );
-        }
+    public boolean eliminarTicket(int idTicket){
         // validamos existencia
         buscarTicketId(idTicket);
         ticketRepository.eliminarLogico(idTicket);
