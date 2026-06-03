@@ -62,7 +62,7 @@ public class UsuarioRepositoryJdbc implements IUsuarioRepository {
     // existsByUsername
     @Override
     public boolean existsByUsername(String username) {
-        String sql = "SELECT * COUNT(*) FROM usuarios WHERE username = ?";
+        String sql = "SELECT COUNT(*) FROM usuarios WHERE username = ?";
         Integer count =jdbcTemplate.queryForObject(sql, Integer.class, username);
         return count != null && count > 0;
     }
@@ -70,7 +70,7 @@ public class UsuarioRepositoryJdbc implements IUsuarioRepository {
     // existsByEmail
     @Override
     public boolean existsByEmail(String email) {
-        String sql = "SELECT * COUNT(*) FROM usuarios WHERE email = ?";
+        String sql = "SELECT COUNT(*) FROM usuarios WHERE email = ?";
         Integer count =jdbcTemplate.queryForObject(sql, Integer.class, email);
         return count != null && count > 0;
     }

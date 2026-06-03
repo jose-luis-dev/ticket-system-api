@@ -5,6 +5,7 @@ import com.ticketSystem.controller.dto.ValidationErrorResponse;
 import com.ticketSystem.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -100,14 +101,25 @@ public class GlobalExceptionHandler {
                 ));
     }
 
-    // 500 - Error de base de datos
+    // 409 - Enum invalido o campo no deserializable
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleNotReadable(HttpMessageNotReadableException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(
+                        "Valor inválido en el body. Verifica los campos enum como 'rol': debe ser USER o ADMIN",
+                        ex.getMessage()
+                ));
+    }
+
+    // 409 - Duplicados de usuario y errores de negocio en DB
     @ExceptionHandler(DatabaseException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public Map<String, String> handleDatabase(DatabaseException ex){
-        return  Map.of(
-                "error", "DATABASE_ERROR",
-                "message", ex.getMessage()
-        );
+    public ResponseEntity<ErrorResponse> handleDatabaseException(DatabaseException ex) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(new ErrorResponse(
+                        "CONFLICT",
+                        ex.getMessage()));
     }
 
     // 500 - Error general
