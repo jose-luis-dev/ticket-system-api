@@ -1,15 +1,14 @@
-package com.ticketSystem.model;
+package com.ticketSystem.controller.dto;
 
 import com.ticketSystem.enums.EstadoRegistro;
 import com.ticketSystem.enums.RolUsuario;
 
 import java.time.LocalDateTime;
 
-public class Usuario {
+public class UsuarioResponse {
 
     private Long id;
     private String username;
-    private String password;
     private String nombre;
     private String email;
     private RolUsuario rol;
@@ -17,16 +16,11 @@ public class Usuario {
     private LocalDateTime createdAt;
     private String createdBy;
 
-    public Usuario(){}
-
-    public Usuario(Long id,String username, String password,
-                   String nombre, String email,RolUsuario rol,
-                   EstadoRegistro estado, LocalDateTime createdAt,
-                   String createdBy){
-
+    public UsuarioResponse(Long id, String username, String nombre,
+                           String email, RolUsuario rol, EstadoRegistro estado,
+                           LocalDateTime createdAt, String createdBy) {
         this.id = id;
         this.username = username;
-        this.password = password;
         this.nombre = nombre;
         this.email = email;
         this.rol = rol;
@@ -47,13 +41,6 @@ public class Usuario {
     }
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getNombre() {

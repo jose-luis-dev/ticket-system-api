@@ -1,10 +1,13 @@
 package com.ticketSystem.controller;
 
-import com.ticketSystem.controller.dto.AuthResponse;
-import com.ticketSystem.controller.dto.LoginRequest;
+import com.ticketSystem.application.RegisterUserUseCase;
+import com.ticketSystem.controller.dto.*;
+import com.ticketSystem.model.Usuario;
 import com.ticketSystem.security.JwtService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,11 +23,13 @@ public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final RegisterUserUseCase registerUserUseCase;
 
     public AuthController(AuthenticationManager authenticationManager,
-                          JwtService jwtService) {
+                          JwtService jwtService, RegisterUserUseCase registerUserUseCase) {
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
+        this.registerUserUseCase = registerUserUseCase;
     }
 
 
@@ -49,6 +54,24 @@ public class AuthController {
         } catch (org.springframework.security.core.AuthenticationException ex) {
             return ResponseEntity.status(401).build();
         }
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/register")
+    public ResponseEntity<ApiResponse<UsuarioResponse>> register(
+            @Valid @RequestBody RegisterUserRequest request,
+            Authentication authentication) {
+
+            // Quién está creando este usuario (auditoría)
+            String createdBy = authentication.getName();
+
+            Usuario nuevo = registerUserUseCase.execute(request, createdBy);
+            UsuarioResponse response = UsuarioMapper.toResponse(nuevo);
+
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(ApiResponse.success(response, "Usuario creado exitosamente"));
+
     }
 
 }
