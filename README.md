@@ -1,165 +1,338 @@
-# Ticket System API (Spring Boot)
+# 🎫 Ticket System API
+
+![Java](https://img.shields.io/badge/Java-17+-orange?style=flat&logo=java)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.x-brightgreen?style=flat&logo=springboot)
+![Spring Security](https://img.shields.io/badge/Spring_Security-JWT-brightgreen?style=flat&logo=springsecurity)
+![MySQL](https://img.shields.io/badge/MySQL-8.x-blue?style=flat&logo=mysql)
+![Maven](https://img.shields.io/badge/Maven-3.x-red?style=flat&logo=apachemaven)
+![Version](https://img.shields.io/badge/version-v5.0-blueviolet?style=flat)
+
+Backend empresarial desarrollado en **Java con Spring Boot** para la gestión 
+de tickets de soporte técnico. El proyecto simula un sistema real inspirado 
+en herramientas como **Odoo**, evolucionando desde una aplicación de consola 
+hasta una API REST segura con autenticación JWT, máquina de estados, 
+y gestión real de usuarios con BCrypt.
 
 ---
 
-## Descripción
+## 📋 Tabla de contenidos
 
-Backend desarrollado en Java con Spring Boot que expone una API REST para la gestión de tickets.
-El proyecto evoluciona desde una aplicación en consola hasta una arquitectura backend moderna, incorporando buenas prácticas como separación por capas, manejo estructurado de errores, y seguridad basada en JWT.
-
-
-# Ticket System API (Spring Boot)
+- [Evolución del proyecto](#evolución-del-proyecto)
+- [Arquitectura](#arquitectura)
+- [Tecnologías](#tecnologías)
+- [Configuración e instalación](#configuración-e-instalación)
+- [Seguridad](#seguridad)
+- [Endpoints](#endpoints)
+- [Estructura del proyecto](#estructura-del-proyecto)
+- [Roadmap](#roadmap)
 
 ---
 
-
-## Evolución del proyecto
+## 🚀 Evolución del proyecto
 
 ### v1.0 - Console
-- CRUD de tickets en memoria
-- Uso de ArrayList
-- Menú interactivo
+- CRUD de tickets en memoria con `ArrayList`
+- Menú interactivo en consola
 - Roles básicos
 
-### v1.0-jdbc Persistence
+### v1.0-jdbc - Persistence
 - Migración a Maven
 - Integración con MySQL
-- CRUD persistence con JDBC
+- CRUD persistente con JDBC
 - Eliminación lógica de registros
 
 ### v1.1 - Application Layer
-- Implementación de arquitectura por capas
-- Introducción de Use Case Pattern
+- Arquitectura por capas
+- Use Case Pattern
 - Separación de responsabilidades (UI / Application / Domain)
 - Inyección de dependencias manual
 
 ### v2.0 - Spring Boot API
 - Migración completa a Spring Boot
-- Exposición de endPoints REST (GET / POST)
-- Integración con JDBC + Datasource
-- Manejo global de excepciones (@RestControllerAdvice)
-- Estructura base para backend escalable
+- Endpoints REST (GET / POST)
+- Integración JDBC + Datasource
+- Manejo global de excepciones (`@RestControllerAdvice`)
 
 ### v2.1 - API Standardization & Validation
-- Implementación de DTOs (Request / Response)
-- Introducción de `ResponseEntity` con códigos HTTP correctos (200, 201, 204, 400, 403)
-- Estandarización de respuesta con:
-    - `ApiResponse` (respuestas exitosas)
-    - `ErrorResponse` (errores de negocio)
-    - `ValidationErrorResponse` (errores de validación por campo)
-- Validaciones con Bean Validation (`@Valid`. `@NotBlank`)
-- Manejo estructurado de errores de entrada (400 Bad Request)
-- Simulación de autorización basada en roles mediante headers (`X-User-Role`)
-- Mejora del contrato API para integración con frontend
+- DTOs (Request / Response)
+- `ResponseEntity` con códigos HTTP correctos
+- Respuestas estandarizadas: `ApiResponse`, `ErrorResponse`, `ValidationErrorResponse`
+- Validaciones con Bean Validation (`@Valid`, `@NotBlank`)
+- Autorización por headers (`X-User-Role`)
 
 ### v3.0 - Security (JWT Authentication & Authorization)
-
-- Implementación de autenticación basada en JWT (stateless)
-- Reemplazo de Basic Auth por tokens (`Bearer`)
-- Creación de `JwtAuthenticationFilter` para validar cada request
-- Integración con `UserDetailsService`
-- Autorización por roles usando `@PreAuthorize`
-- Eliminación de headers manuales (`X-User-Role`)
-- Manejo robusto de errores de seguridad:
-  - `401 Unauthorized` (no autenticado)
-  - `403 Forbidden` (sin permisos)
-- Respuestas JSON consistentes en toda la API
-- Configuración externa de seguridad (`jwt.secret`, `jwt.expiration`)
-- Logging estructurado para eventos de autenticación
+- Autenticación stateless con JWT
+- Reemplazo de Basic Auth por tokens `Bearer`
+- `JwtAuthenticationFilter` para validar cada request
+- Autorización por roles con `@PreAuthorize`
+- Manejo estructurado de errores de seguridad (401 / 403)
+- Configuración externa (`jwt.secret`, `jwt.expiration`)
 
 ### v4.0 - State Machine & Domain Rules
+- State Machine implementada sin librería externa
+- `TicketStateTransitionValidator` a nivel de dominio
+- Bloqueo de modificación de prioridad en estado final
+- Excepciones de dominio: `InvalidTransitionException`, `InvalidOperationException`
+- Use Cases: `UpdateTicketStatusUseCase`, `UpdateTicketPriorityUseCase`
+- Endpoints PATCH para estado y prioridad
+- Errores de dominio retornan `409 Conflict`
 
-- Implementación de State Machine sin librería externa
-- Validación de transiciones de estado a nivel de dominio con `TicketStateTransitionValidator`
-- Bloqueo de modificación de prioridad en tickets con estado final
-- Nuevas excepciones de dominio: `InvalidTransicionException`, `InvalidOperationException`
-- Nuevos Use Cases: `UpdateTicketStatusUseCase`, `UpdateTicketPriorityUseCase`
-- Nuevos endpoints PATCH para estado y prioridad
-- Fix GlobalExceptionHandler: errores de dominio retornan 409 Conflict
+**Business rules:**
 
-Business rules:
-- ABIERTO -> EN_PROCESO, CANCELADO
-- EN_PROCESO -> CERRADO, CANCELADO
-- CERRADO -> estado final (irreversible)
-- CANCELADO -> estado final (irreversible)
-- La prioridad no puede modificarse si el ticket está CERRADO o CANCELADO
+- ABIERTO    → EN_PROCESO, CANCELADO
+- EN_PROCESO → CERRADO, CANCELADO
+- CERRADO    → estado final (irreversible)
+- CANCELADO  → estado final (irreversible)
+- Prioridad no modificable en estado final
+
+### v5.0 - Real User Management ⬅️ actual
+- Tabla `usuarios` con persistencia real en MySQL
+- `CustomUserDetailsService` conectado a DB (elimina mock)
+- Passwords encriptados con **BCrypt** (rounds=10)
+- Endpoint `POST /auth/register` exclusivo para ADMIN
+- Admin master crea usuarios con roles `ADMIN` o `USER`
+- Usuarios `INACTIVO` bloqueados en autenticación
+- Auditoría: `created_by` registra quién creó cada usuario
+- Fix: `SecurityConfig` separa `/auth/login` de `/auth/register`
+- Fix: `GlobalExceptionHandler` cubre 409 (duplicados) y 400 (enums inválidos)
+- Fix: eliminado constructor parcial de `Usuario` y validación de rol redundante
 
 ---
 
-## Tecnologías
+## 🏛️ Arquitectura
 
+El proyecto sigue una **arquitectura por capas** con separación clara de responsabilidades:
+
+
+| Etapa | Proceso |
+|---|---|
+| Controller Layer | Recibe requests HTTP, valida DTOs |
+| Use Case Layer | Orquesta lógica de negocio |
+| Service Layer    | Reglas de dominio |
+| Repository Layer    | Acceso a datos (JDBC) |
+| MySQL DB    | tickets + usuarios |
+
+**Seguridad (transversal a todas las capas):**
+- JwtAuthenticationFilter → SecurityConfig → @PreAuthorize
+
+---
+
+## 🛠️ Tecnologías
+
+| Tecnología | Versión | Uso |
+|---|---|---|
+| Java | 17+ | Lenguaje principal |
+| Spring Boot | 3.x | Framework base |
+| Spring Security | 6.x | Autenticación y autorización |
+| JWT (jjwt) | 0.12.x | Tokens stateless |
+| JDBC | — | Acceso a datos sin ORM |
+| MySQL | 8.x | Base de datos |
+| Maven | 3.x | Gestión de dependencias |
+| BCrypt | — | Encriptación de passwords |
+
+---
+
+## ⚙️ Configuración e instalación
+
+### Prerrequisitos
 - Java 17+
-- Spring Boot
-- Spring Security
-- JWT (jjwt)
-- JDBC
-- MySQL
-- Maven
+- MySQL 8+
+- Maven 3+
 
+### 1. Clonar el repositorio
+```bash
+git clone https://github.com/jose-luis-dev/ticket-system-api.git
+cd ticket-system-api
+```
 
-## Seguridad
+### 2. Configurar base de datos
+```sql
+CREATE DATABASE ticket_system;
+```
+Ejecutar los scripts en orden:
+
+```
+src/main/resources/db/V1__create_tickets_table.sql
+src/main/resources/db/V2__create_usuarios_table.sql
+
+### 3. Configurar `application.yaml`
+Copia el archivo de ejemplo y ajusta tus credenciales:
+```bash
+cp src/main/resources/application-example.yaml \
+   src/main/resources/application.yaml
+```
+```yaml
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/ticket_system
+    username: TU_USUARIO
+    password: TU_PASSWORD
+
+jwt:
+  secret: "tu-secret-key-minimo-32-caracteres"
+  expiration: 3600000
+```
+
+### 4. Insertar admin master
+```sql
+-- Password: admin123
+INSERT INTO usuarios (username, password, nombre, email, rol, estado, created_by)
+VALUES (
+    'admin',
+    '$2a$10$HASH_GENERADO_CON_TU_APP',
+    'Administrador Master',
+    'admin@empresa.com',
+    'ADMIN', 'ACTIVO', 'SYSTEM'
+);
+```
+> ⚠️ Genera el hash ejecutando `GenerarHash.java` con tu propio `BCryptPasswordEncoder`
+
+### 5. Ejecutar
+```bash
+mvn spring-boot:run
+```
+
+---
+
+## 🔐 Seguridad
+
+### Flujo de autenticación
+
+POST /auth/login { username, password }<br>
+↓<br>
+CustomUserDetailsService (consulta MySQL)<br>
+↓<br>
+BCrypt.matches(rawPassword, hashDB)<br>
+↓<br>
+JwtService.generateToken()<br>
+↓<br>
+{ token: "eyJhbGc..." }<br>
+
+### Flujo de autorización
+
+Request con Bearer Token<br>
+↓<br>
+JwtAuthenticationFilter (valida token)<br>
+↓<br>
+@PreAuthorize("hasRole('ADMIN')")<br>
+↓<br>
+Use Case → Service → Repository<br>
+
+---
+
+## 📡 Endpoints
 
 ### Autenticación
+| Método | Endpoint | Acceso | Descripción |
+|---|---|---|---|
+| POST | `/auth/login` | Público | Obtiene token JWT |
+| POST | `/auth/register` | ADMIN | Crea nuevo usuario |
 
-<img width="617" height="234" alt="image" src="https://github.com/user-attachments/assets/1a1d8ae1-eea2-4af3-b3aa-2464d76b6ac2" />
-
-
-<img width="974" height="171" alt="image" src="https://github.com/user-attachments/assets/929da25e-ca1f-408a-b98c-9a62addc598c" />
-
-
-
-### Endpoints
-
-- GET /tickets --> Requiere autenticación
-- GET /tickets/{id} --> Requiere autenticación
-- POST /tickets --> Requiere autenticación
-- DELETE /tickets/{id} --> Solo ADMIN puede ejecutar el proceso
-- PATCH /tickets/{id}/estado --> ADMIN y USER
-- PATCH /tickets/{id}/prioridad --> ADMIN y USER
-
+### Tickets
+| Método | Endpoint | Acceso | Descripción |
+|---|---|---|---|
+| GET | `/tickets` | Autenticado | Lista todos los tickets |
+| GET | `/tickets/{id}` | Autenticado | Obtiene ticket por ID |
+| POST | `/tickets` | Autenticado | Crea nuevo ticket |
+| DELETE | `/tickets/{id}` | ADMIN | Eliminación lógica |
+| PATCH | `/tickets/{id}/estado` | ADMIN, USER | Cambia estado |
+| PATCH | `/tickets/{id}/prioridad` | ADMIN, USER | Cambia prioridad |
 
 ### Códigos de respuesta
-
-- 200 --> OK
-- 201 --> Created
-- 204 --> No Content
-- 400 --> Bad Request (datos de entrada inválidos)
-- 401 --> Unauthorized
-- 403 --> Forbidden
-- 404 --> Not Found (ticket no existe)
-- 409 --> Conflict (transición de estado inválido / operación bloqueada por estado final)
-- 500 --> Internal Server Error
-
----
-### Ejemplo de respuesta API
-
-<img width="492" height="249" alt="image" src="https://github.com/user-attachments/assets/8fdbd1a8-7a56-4148-91ec-859d6b9e7ab8" />
-
-
-### Ejemplo de error de validacion API
-
-<img width="711" height="161" alt="image" src="https://github.com/user-attachments/assets/17510894-399f-4fc3-9eb8-ac640c961f0f" />
-
-
-<img width="503" height="238" alt="image" src="https://github.com/user-attachments/assets/bb51e68f-14a3-4a37-8a5f-919944ed4ba8" />
+| Código | Significado |
+|---|---|
+| 200 | OK |
+| 201 | Created |
+| 204 | No Content |
+| 400 | Bad Request — datos inválidos |
+| 401 | Unauthorized — sin token |
+| 403 | Forbidden — sin permisos |
+| 404 | Not Found — recurso no existe |
+| 409 | Conflict — duplicado o transición inválida |
+| 500 | Internal Server Error |
 
 ---
 
+## 📁 Estructura del proyecto
 
-##  Notas técnicas
+src/main/java/com/ticketSystem/<br>
+├── application/<br>
+│   ├── validators/<br>
+│   │   └── TicketStateTransitionValidator<br>
+│   ├── CreateTicketUseCase<br>
+│   ├── DeleteTicketUseCase<br>
+│   ├── GetTicketByIdUseCase<br>
+│   ├── ListTicketUseCase<br>
+│   ├── RegisterUserUseCase<br>
+│   ├── TicketStatisticsUseCase<br>
+│   ├── UpdateTicketPriorityUseCase<br>
+│   └── UpdateTicketStatusUseCase<br>
+├── config/<br>
+│   └── SecurityConfig<br>
+├── controller/<br>
+│   ├── dto/<br>
+│   │   ├── ApiResponse<br>
+│   │   ├── AuthResponse<br>
+│   │   ├── CreateTicketRequest<br>
+│   │   ├── ErrorResponse<br>
+│   │   ├── LoginRequest<br>
+│   │   ├── LoginResponse<br>
+│   │   ├── RegisterUserRequest<br>
+│   │   ├── TicketMapper<br>
+│   │   ├── TicketResponse<br>
+│   │   ├── UpdatePriorityRequest<br>
+│   │   ├── UpdateStatusRequest<br>
+│   │   ├──UsuarioMapper<br>
+│   │   ├──UsuarioResponse<br>
+│   │   └── ValidationErrorResponse<br>
+│   ├── AuthController<br>
+│   └── TicketController<br>
+├── enums/<br>
+│   ├── EstadoOperacional<br>
+│   ├── EstadoRegistro<br>
+│   ├── Prioridad<br>
+│   └── RolUsuario<br>
+├── exception/<br>
+│   ├── handler/<br>
+│   │   └── GlobalExceptionHandler<br>
+│   ├── DatabaseException<br>
+│   ├── InvalidOperationException<br>
+│   ├── InvalidTransitionException<br>
+│   ├── TicketNotFoundException<br>
+│   └── UnauthorizedOperacionException<br>
+├── model/<br>
+│   ├── Ticket<br>
+│   └── Usuario<br>
+├── repository/<br>
+│   ├── ITicketRepository<br>
+│   ├── IUsuarioRepository<br>
+│   ├── TicketRepository<br>
+│   ├── TicketRepositoryJdbc<br>
+│   └── UsuarioRepositoryJdbc<br>
+├── security/<br>
+│   ├── CustomUserDetailsService<br>
+│   ├── JwtAuthenticationFilter<br>
+│   └── JwtService<br>
+└── service/<br>
+└── TicketService<br>
 
-- La API sigue principios REST utilizando códigos HTTP adecuados.
-- Arquitectura basada en capas (Controller, UserCase, Service, Repository)
-- Seguridad implementada con Spring Security y JWT (stateless)
-- Separación clara entre:
-    - Autenticación (JWT)
-    - Autorización (roles)
-    - Reglas de negocio (Use Cases)     
-- Manejo centralizado de errores para mantener consistencia en la API
-- Logging estructurado para monitoreo y debugging
-- Preparado para escalar a persistencia real de usuarios y cifrado de contraseñas
+---
 
+## 🗺️ Roadmap
 
+| Versión | Descripción | Estado |
+|---|---|---|
+| v1.0 | Console CRUD | ✅ Completado |
+| v2.0 | Spring Boot REST API | ✅ Completado |
+| v3.0 | JWT Security | ✅ Completado |
+| v4.0 | State Machine | ✅ Completado |
+| v5.0 | Real User Management | ✅ Completado |
+| v6.0 | Email notifications + ticket assignment | 🔜 Próximo |
+| v7.0 | KPI Dashboard & estadísticas por usuario | 🔜 Planeado |
 
+---
 
+## 👨‍💻 Autor -- Luis Alvarado
 
+Desarrollado como proyecto de portafolio backend — evolucionando hacia
+un sistema empresarial real de gestión de tickets.
