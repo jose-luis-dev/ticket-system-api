@@ -13,7 +13,13 @@ public class InvalidOperationException extends RuntimeException {
         this.estadoActual = estadoActual;
     }
 
+    public InvalidOperationException(String mensaje) {
+        super(mensaje);
+        this.estadoActual = null;
+    }
+
     public EstadoOperacional getEstadoActual() {
         return estadoActual;
     }
+
 }

@@ -106,5 +106,12 @@ public class UsuarioRepositoryJdbc implements IUsuarioRepository {
         return usuario;
     }
 
+    @Override
+    public Optional<Usuario> findById(Long id) {
+        String sql = "SELECT * FROM usuarios WHERE id = ? AND estado = 'ACTIVO'";
+        List<Usuario> results = jdbcTemplate.query(sql, usuarioRowMapper, id);
+        return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
+    }
+
 
 }

@@ -10,4 +10,5 @@ public interface ITicketRepository {
     void guardar(Ticket ticket);
     void actualizar(Ticket ticket);
     void eliminarLogico(int id);
+    void updateAgenteId(Integer ticketId, Long agenteId);
 }

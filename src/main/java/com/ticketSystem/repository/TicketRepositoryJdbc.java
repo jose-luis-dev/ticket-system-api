@@ -165,4 +165,18 @@ public class TicketRepositoryJdbc implements ITicketRepository {
 
     }
 
+    @Override
+    public void updateAgenteId(Integer ticketId, Long agenteId) {
+        String sql = "UPDATE tickets SET agente_id = ? WHERE id = ?";
+        try (Connection con = dataSource.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setLong(1, agenteId);
+            ps.setInt(2, ticketId);
+            ps.executeUpdate();
+
+        }catch (SQLException e) {
+            throw new DatabaseException("Error al actualizar agente del ticket: " + ticketId, e);
+        }
+    }
+
 }

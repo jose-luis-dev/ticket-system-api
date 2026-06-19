@@ -12,11 +12,16 @@ public interface IUsuarioRepository {
     // Busca por email - validación al registrar
     Optional<Usuario> findByEmail(String email);
 
+    // Buscar por id
+    Optional<Usuario> findById(Long id);
+
     // Guardar nuevo usuario - lo usa RegisterUserUseCase
     Usuario save(Usuario usuario);
 
     // Verifica duplicados antes de insertar - Esto evita excepciones de DB
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
+
+
 
 }
